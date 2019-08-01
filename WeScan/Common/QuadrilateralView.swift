@@ -45,7 +45,7 @@ final class QuadrilateralView: UIView {
     public var editable = false {
         didSet {
             cornerViews(hidden: !editable)
-            quadLayer.fillColor = editable ? UIColor(white: 0.0, alpha: 0.6).cgColor : UIColor(white: 1.0, alpha: 0.5).cgColor
+            quadLayer.fillColor = editable ? UIColor(white: 0.0, alpha: 0.6).cgColor : UIColor(red: 51/255.0, green: 102/255.0, blue: 255/255.0, alpha: 0.4).cgColor
             guard let quad = quad else {
                 return
             }
