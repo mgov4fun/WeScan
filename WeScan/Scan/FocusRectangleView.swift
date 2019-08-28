@@ -16,6 +16,9 @@ final class FocusRectangleView: UIView {
         
         // Here, we create the frame to be the `originalSize`, with it's center being the `touchPoint`.
         self.init(frame: CGRect(x: touchPoint.x - (originalSize / 2), y: touchPoint.y - (originalSize / 2), width: originalSize, height: originalSize))
+
+        // fix cancel button becoming unclickable when focus rectangle is drawn over it
+        self.isUserInteractionEnabled = false
         
         backgroundColor = .clear
         layer.borderWidth = 2.0
