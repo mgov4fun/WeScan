@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name             = 'CovveWeScan'
-  spec.version          = '1.1.2'
+  spec.version          = '1.1.4'
   spec.summary          = 'Document Scanning Made Easy for iOS'
   spec.description      = 'WeScan makes it easy to add scanning functionalities to your iOS app! It\'s modelled after UIImagePickerController, which makes it a breeze to use.'
 
