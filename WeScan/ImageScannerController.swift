@@ -65,7 +65,11 @@ public final class ImageScannerController: UINavigationController {
         
         self.imageScannerDelegate = delegate
         
-        if #available(iOS 13.0, *) {
+        if #available(iOS 15.0, *) {
+            navigationBar.tintColor = .white
+            navigationBar.titleTextAttributes = [.foregroundColor : UIColor.white]
+            navigationBar.barStyle = .black
+        } else if #available(iOS 13.0, *) {
             navigationBar.tintColor = .label
         } else {
             navigationBar.tintColor = .black
