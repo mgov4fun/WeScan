@@ -290,7 +290,7 @@ public final class ScannerViewController: UIViewController {
 
     @objc private func photosImageScannerController() {
         guard let imageScannerController = navigationController as? ImageScannerController else { return }
-        imageScannerController.imageScannerDelegate?.imageScannerControllerGoToPhotos(imageScannerController)  // TODO change this
+        imageScannerController.imageScannerDelegate?.imageScannerControllerGoToPhotos(imageScannerController)
     }
 
 }
