@@ -100,8 +100,14 @@ public final class ImageScannerController: UINavigationController {
         guard let ciImage = CIImage(image: image) else { return }
         let orientation = CGImagePropertyOrientation(image.imageOrientation)
         let orientedImage = ciImage.oriented(forExifOrientation: Int32(orientation.rawValue))
-
-        if #available(iOS 11.0, *) {
+        
+        if #available(iOS 15.0, *) {
+            // Use the VisionDocumentDetector on iOS 15 to attempt to find a document from the initial image.
+            VisionDocumentDetector.rectangle(forImage: ciImage, orientation: orientation) { quad in
+                let detectedQuad = quad?.toCartesian(withHeight: orientedImage.extent.height)
+                completion(detectedQuad)
+            }
+        } else if #available(iOS 11.0, *) {
             // Use the VisionRectangleDetector on iOS 11 to attempt to find a rectangle from the initial image.
             VisionRectangleDetector.rectangle(forImage: ciImage, orientation: orientation) { quad in
                 let detectedQuad = quad?.toCartesian(withHeight: orientedImage.extent.height)
