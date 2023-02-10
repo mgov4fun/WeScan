@@ -19,7 +19,6 @@ final class FocusRectangleView: UIView {
 
         // fix cancel button becoming unclickable when focus rectangle is drawn over it
         self.isUserInteractionEnabled = false
-
         backgroundColor = .clear
         layer.borderWidth = 2.0
         layer.cornerRadius = 6.0

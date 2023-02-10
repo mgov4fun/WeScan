@@ -69,7 +69,6 @@ final class ReviewViewController: UIViewController {
         super.viewDidLoad()
 
         enhancedImageIsAvailable = false
-
         setupViews()
         setupToolbar()
         setupConstraints()
