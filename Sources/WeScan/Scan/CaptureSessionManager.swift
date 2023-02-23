@@ -51,7 +51,13 @@ final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBuffe
 
     private let videoPreviewLayer: AVCaptureVideoPreviewLayer
     private let captureSession = AVCaptureSession()
-    private let rectangleFunnel = RectangleFeaturesFunnel()
+    private let rectangleFunnel: RectangleFeaturesFunnel = {
+        let funnel = RectangleFeaturesFunnel()
+        if #available(iOS 15.0, *) { // decrease auto-scan threshold if using document detector
+            funnel.autoScanMatchingThreshold = 2.0
+        }
+        return funnel
+    }()
     weak var delegate: RectangleDetectionDelegateProtocol?
     private var displayedRectangleResult: RectangleDetectorResult?
     private var photoOutput = AVCapturePhotoOutput()
@@ -184,7 +190,11 @@ final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBuffe
 
         let imageSize = CGSize(width: CVPixelBufferGetWidth(pixelBuffer), height: CVPixelBufferGetHeight(pixelBuffer))
 
-        if #available(iOS 11.0, *) {
+        if #available(iOS 15.0, *) {
+            VisionDocumentDetector.rectangle(forPixelBuffer: pixelBuffer) { rectangle in
+                self.processRectangle(rectangle: rectangle, imageSize: imageSize)
+            }
+        } else if #available(iOS 11.0, *) {
             VisionRectangleDetector.rectangle(forPixelBuffer: pixelBuffer) { rectangle in
                 self.processRectangle(rectangle: rectangle, imageSize: imageSize)
             }
@@ -255,7 +265,7 @@ final class CaptureSessionManager: NSObject, AVCaptureVideoDataOutputSampleBuffe
 }
 
 extension CaptureSessionManager: AVCapturePhotoCaptureDelegate {
-
+    
     // swiftlint:disable function_parameter_count
     func photoOutput(_ captureOutput: AVCapturePhotoOutput,
                      didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?,
@@ -268,36 +278,36 @@ extension CaptureSessionManager: AVCapturePhotoCaptureDelegate {
             delegate?.captureSessionManager(self, didFailWithError: error)
             return
         }
-
+        
         isDetecting = false
         rectangleFunnel.currentAutoScanPassCount = 0
         delegate?.didStartCapturingPicture(for: self)
-
+        
         if let sampleBuffer = photoSampleBuffer,
-            let imageData = AVCapturePhotoOutput.jpegPhotoDataRepresentation(
-                forJPEGSampleBuffer: sampleBuffer,
-                previewPhotoSampleBuffer: nil
-            ) {
+           let imageData = AVCapturePhotoOutput.jpegPhotoDataRepresentation(
+            forJPEGSampleBuffer: sampleBuffer,
+            previewPhotoSampleBuffer: nil
+           ) {
             completeImageCapture(with: imageData)
         } else {
             let error = ImageScannerControllerError.capture
             delegate?.captureSessionManager(self, didFailWithError: error)
             return
         }
-
+        
     }
-
+    
     @available(iOS 11.0, *)
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error {
             delegate?.captureSessionManager(self, didFailWithError: error)
             return
         }
-
+        
         isDetecting = false
         rectangleFunnel.currentAutoScanPassCount = 0
         delegate?.didStartCapturingPicture(for: self)
-
+        
         if let imageData = photo.fileDataRepresentation() {
             completeImageCapture(with: imageData)
         } else {
@@ -306,7 +316,7 @@ extension CaptureSessionManager: AVCapturePhotoCaptureDelegate {
             return
         }
     }
-
+    
     /// Completes the image capture by processing the image, and passing it to the delegate object.
     /// This function is necessary because the capture functions for iOS 10 and 11 are decoupled.
     private func completeImageCapture(with imageData: Data) {
@@ -322,9 +332,9 @@ extension CaptureSessionManager: AVCapturePhotoCaptureDelegate {
                 }
                 return
             }
-
+            
             var angle: CGFloat = 0.0
-
+            
             switch image.imageOrientation {
             case .right:
                 angle = CGFloat.pi / 2
@@ -333,13 +343,13 @@ extension CaptureSessionManager: AVCapturePhotoCaptureDelegate {
             default:
                 break
             }
-
+            
             var quad: Quadrilateral?
             if let displayedRectangleResult = self?.displayedRectangleResult {
                 quad = self?.displayRectangleResult(rectangleResult: displayedRectangleResult)
                 quad = quad?.scale(displayedRectangleResult.imageSize, image.size, withRotationAngle: angle)
             }
-
+            
             DispatchQueue.main.async {
                 guard let self else {
                     return
