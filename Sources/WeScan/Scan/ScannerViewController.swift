@@ -35,14 +35,6 @@ public final class ScannerViewController: UIViewController {
         return button
     }()
 
-    private lazy var photosButton: UIButton = {
-        let button = UIButton()
-        button.setTitle(NSLocalizedString("wescan.scanning.photos", tableName: nil, bundle: Bundle(for: ScannerViewController.self), value: "Photos", comment: "The photos button"), for: .normal)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(photosImageScannerController), for: .touchUpInside)
-        return button
-    }()
-
     private lazy var cancelButton: UIButton = {
         let button = UIButton()
         button.setTitle(NSLocalizedString("wescan.scanning.cancel", tableName: nil, bundle: Bundle(for: ScannerViewController.self), value: "Cancel", comment: "The cancel button"), for: .normal)
@@ -134,7 +126,6 @@ public final class ScannerViewController: UIViewController {
         view.addSubview(quadView)
         view.addSubview(cancelButton)
         view.addSubview(shutterButton)
-        view.addSubview(photosButton)
         view.addSubview(activityIndicator)
     }
 
@@ -153,7 +144,6 @@ public final class ScannerViewController: UIViewController {
         var quadViewConstraints = [NSLayoutConstraint]()
         var cancelButtonConstraints = [NSLayoutConstraint]()
         var shutterButtonConstraints = [NSLayoutConstraint]()
-        var photosButtonConstraints = [NSLayoutConstraint]()
         var activityIndicatorConstraints = [NSLayoutConstraint]()
 
         quadViewConstraints = [
@@ -179,10 +169,6 @@ public final class ScannerViewController: UIViewController {
                 cancelButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24.0),
                 view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
             ]
-            photosButtonConstraints = [
-                photosButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -24.0),
-                view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: photosButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
-            ]
 
             let shutterButtonBottomConstraint = view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 8.0)
             shutterButtonConstraints.append(shutterButtonBottomConstraint)
@@ -191,16 +177,12 @@ public final class ScannerViewController: UIViewController {
                 cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 24.0),
                 view.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
             ]
-            photosButtonConstraints = [
-                photosButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -24.0),
-                view.bottomAnchor.constraint(equalTo: photosButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
-            ]
 
             let shutterButtonBottomConstraint = view.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 8.0)
             shutterButtonConstraints.append(shutterButtonBottomConstraint)
         }
 
-        NSLayoutConstraint.activate(quadViewConstraints + cancelButtonConstraints + shutterButtonConstraints + photosButtonConstraints + activityIndicatorConstraints)
+        NSLayoutConstraint.activate(quadViewConstraints + cancelButtonConstraints + shutterButtonConstraints + activityIndicatorConstraints)
     }
 
     // MARK: - Tap to Focus
@@ -286,11 +268,6 @@ public final class ScannerViewController: UIViewController {
     @objc private func cancelImageScannerController() {
         guard let imageScannerController = navigationController as? ImageScannerController else { return }
         imageScannerController.imageScannerDelegate?.imageScannerControllerDidCancel(imageScannerController)
-    }
-
-    @objc private func photosImageScannerController() {
-        guard let imageScannerController = navigationController as? ImageScannerController else { return }
-        imageScannerController.imageScannerDelegate?.imageScannerControllerGoToPhotos(imageScannerController)
     }
 
 }
